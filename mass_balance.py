@@ -55,7 +55,8 @@ def print_fuel_requirements(aircraft_registration, fuel, fuel_alt):
     print('Reserve fuel is 1 hour, for : ', fuel_conso * 60, ' L')
     print(f'Total Fuel is {fuel + fuel * 0.1 + fuel_alt + 60} minutes : {((fuel + fuel * 0.1 + fuel_alt + 60) * fuel_conso)} L')
 
-def get_mass_and_cg_data(aircraft_registration, slopes):
+def get_mass_and_cg_data(aircraft_registration, slopes, fuel, fuel_conso, fuel_dens):
+    #Format : LY-123, slopes, Fuel time of the trip, Litres per hour, Fuel density (0.72)
     print('####################################')
     print('###  MASS & CG  ###')
     print('####################################')
@@ -73,31 +74,41 @@ def get_mass_and_cg_data(aircraft_registration, slopes):
 
     total_weight = empty_weight
     total_load_moment = empty_weight_moment
+    total_weight_post_trip = empty_weight
+    total_load_moment_post_trip = empty_weight_moment
 
     for load_type in load_types:
         weight = float(input(f"Enter the load weight (in kg) for {load_type.replace('_', ' ')}: "))
         load_moment = calculate_load_moment(weight, load_type, slopes)
+           
         print(f"The load moment for {load_type.replace('_', ' ')} with weight {weight} kg is {load_moment:.2f} kg-mm.")
         total_weight += weight
         total_load_moment += load_moment
 
-    return total_weight, total_load_moment, MTOW
+        if load_type == 'fuel' :
+            weight_fuel_post_trip = weight - (fuel/60) * fuel_conso * fuel_dens 
+            load_moment_fuel_post_trip = calculate_load_moment(weight_fuel_post_trip, 'fuel', slopes)
+            total_weight_post_trip += weight_fuel_post_trip
+            total_load_moment_post_trip += load_moment_fuel_post_trip
+        else : 
+            total_weight_post_trip += weight
+            total_load_moment_post_trip += load_moment
 
-def fuel_trip_moment(aircraft_registration, total_weight, total_load_moment, fuel) :
-    print('####################################')
-    print('###  END of TRIP FUEL & MOMENT  ###')
-    print('####################################')
-    total_weight -= fuel * fuel_conso * fuel_density
+    return total_weight, total_weight_post_trip, total_load_moment, total_load_moment_post_trip, MTOW
 
 
-def print_total_weight_and_moment(aircraft_registration, total_weight, total_load_moment, MTOW):
+
+def print_total_weight_and_moment(aircraft_registration, total_weight, total_weight_post_trip, total_load_moment, total_load_moment_post_trip, MTOW):
     print('####################################')
     print(f"Aircraft {aircraft_registration}: Empty Weight = {aircraft_data[aircraft_registration]['empty_weight']},")
     print(f"Empty Weight Moment = {aircraft_data[aircraft_registration]['empty_weight_moment']} kg-mm, MTOW = {MTOW} kg")
-    print(f"Total weight is {total_weight:.2f} kg.")
+    print(f"Total Weight is {total_weight:.2f} kg.")
     print(f"Total load moment is {total_load_moment:.2f} kg-mm.")
+    print(f"Landing Weight is {total_weight_post_trip:.2f} kg.")
+    print(f"Landing Load Moment is {total_load_moment_post_trip:.2f} kg-mm.")
     if total_weight > MTOW:
         print("---ATTENTION PILOT--- Total weight exceeds MTOW! Get your papers in order or DO NOT FLY")
+    
 
 def main():
     slopes = initialize_slopes()
@@ -109,8 +120,15 @@ def main():
     
     fuel, fuel_alt = get_fuel_data()
     print_fuel_requirements(aircraft_registration, fuel, fuel_alt)
-    total_weight, total_load_moment, MTOW = get_mass_and_cg_data(aircraft_registration, slopes)
-    print_total_weight_and_moment(aircraft_registration, total_weight, total_load_moment, MTOW)
+    total_weight, total_weight_post_trip, total_load_moment, total_load_moment_post_trip, MTOW = get_mass_and_cg_data(
+    aircraft_registration, slopes, fuel, 
+    aircraft_data[aircraft_registration]['fuel_conso'],
+    aircraft_data[aircraft_registration]['fuel_density']
+    )
+
+    print_total_weight_and_moment(aircraft_registration, total_weight, total_weight_post_trip, total_load_moment, total_load_moment_post_trip, MTOW)
+
+
 
 if __name__ == "__main__":
     main()

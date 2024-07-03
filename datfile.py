@@ -40,17 +40,17 @@ airports = {
     }
 }
 
-
+#Units = AC_Registration: KG, KG, KG, Litres, KG:L
 aircraft_data = {
-    'LY-BAK': {'empty_weight_moment': 782, 'empty_weight': 785, 'MTOW': 1157, 'fuel_conso': 36},
-    'LY-FTK': {'empty_weight_moment': 823.33, 'empty_weight': 776.1, 'MTOW': 1157, 'fuel_conso': 36},
-    'LY-FTG': {'empty_weight_moment': 823.48, 'empty_weight': 774.3, 'MTOW': 1157, 'fuel_conso': 36},
-    'LY-MEP': {'empty_weight_moment': 395, 'empty_weight': 868, 'MTOW': 1230, 'fuel_conso': 34},
-    'LY-FTA': {'empty_weight_moment': 807.73, 'empty_weight': 788.8, 'MTOW': 1157, 'fuel_conso': 36},
+    'LY-BAK': {'empty_weight_moment': 782, 'empty_weight': 785, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-FTK': {'empty_weight_moment': 823.33, 'empty_weight': 776.1, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-FTG': {'empty_weight_moment': 823.48, 'empty_weight': 774.3, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-FTA': {'empty_weight_moment': 807.73, 'empty_weight': 788.8, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-FTF': {'empty_weight_moment': 833.69, 'empty_weight': 783.35, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-FTX': {'empty_weight_moment': 821, 'empty_weight': 782, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'LY-BGV': {'empty_weight_moment': 825.06, 'empty_weight': 780.4, 'MTOW': 1100, 'fuel_conso': 36, 'fuel_density': 0.72}
+    #'LY-MEP': {'empty_weight_moment': 395, 'empty_weight': 868, 'MTOW': 1230, 'fuel_conso': 34, 'fuel_density': 0.72},
 
-    'LY-FTF': {'empty_weight_moment': 833.69, 'empty_weight': 783.35, 'MTOW': 1157, 'fuel_conso': 36},
-    'LY-FTX': {'empty_weight_moment': 821, 'empty_weight': 782, 'MTOW': 1157, 'fuel_conso': 36},
-    'LY-BGV': {'empty_weight_moment': 825.06, 'empty_weight': 780.4, 'MTOW': 1100, 'fuel_conso': 36}
 }
 
 # Mass and balance coordinates of the loading diagram
