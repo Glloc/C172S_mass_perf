@@ -2,8 +2,6 @@
 
 
 #Todo
-#clean up sequencing
-#trip fuel + LDG weight to calc
 #GUI
 #PDF output
 
@@ -49,11 +47,12 @@ def print_fuel_requirements(aircraft_registration, fuel, fuel_alt):
     print(f"Aircraft {aircraft_registration}: Empty Weight Moment = {empty_weight_moment} kg-mm, MTOW = {MTOW} kg")
 
     fuel_conso = float(aircraft_data[aircraft_registration]['fuel_conso']) / 60
-    print('Required trip litres for ', fuel, ' minutes : ', fuel * fuel_conso, ' L')
+    total_fuel_time = fuel + fuel * 0.1 + fuel_alt + 60
+    print(f'Required trip litres for {fuel} minutes : {(fuel * fuel_conso):.2f} L or {(fuel * fuel_conso / 3.785):.2f} gal (US)')
     print(f'Required 10% contingency litres for {fuel * 0.1} minutes : {((fuel * fuel_conso * 0.1)):.2f} L')
     print('Required litres for diverting to alternate of ', fuel_alt, ' minutes : ', fuel_alt * fuel_conso, ' L')
     print('Reserve fuel is 1 hour, for : ', fuel_conso * 60, ' L')
-    print(f'Total Fuel is {fuel + fuel * 0.1 + fuel_alt + 60} minutes : {((fuel + fuel * 0.1 + fuel_alt + 60) * fuel_conso)} L')
+    print(f'Total Fuel is {total_fuel_time:.2f} minutes : {(total_fuel_time * fuel_conso)} L or {((total_fuel_time * fuel_conso) / 3.785):.2f} gal (US)')
 
 def get_mass_and_cg_data(aircraft_registration, slopes, fuel, fuel_conso, fuel_dens):
     #Format : LY-123, slopes, Fuel time of the trip, Litres per hour, Fuel density (0.72)
