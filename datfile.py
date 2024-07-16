@@ -48,6 +48,7 @@ aircraft_data = {
     'LY-FTA': {'empty_weight_moment': 807.73, 'empty_weight': 788.8, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
     'LY-FTF': {'empty_weight_moment': 833.69, 'empty_weight': 783.35, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
     'LY-FTX': {'empty_weight_moment': 821, 'empty_weight': 782, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'OO-JDH': {'empty_weight_moment': 839, 'empty_weight': 781, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
     'LY-BGV': {'empty_weight_moment': 825.06, 'empty_weight': 780.4, 'MTOW': 1100, 'fuel_conso': 36, 'fuel_density': 0.72}
     #'LY-MEP': {'empty_weight_moment': 395, 'empty_weight': 868, 'MTOW': 1230, 'fuel_conso': 34, 'fuel_density': 0.72},
 
@@ -214,3 +215,37 @@ table_ldg_2550lb = np.array(
    [7000, 40, 810, 1705],
    [8000, 40, 840, 1755]]
     ])
+
+
+info_wind = """
+            Wind Limitations:
+
+            If flying dual (Phase 1 and 2):
+            - Max wind speed: 25 KT
+            - Max crosswind: 12 KT 
+
+            If flying dual in Phase 3, 4, or 5:
+            - Max wind speed: 35 KT
+            - Max crosswind: 15 KT
+
+            If flying solo for the first time:
+            - Max wind speed: 10 KT
+            - Max crosswind: 7 KT
+
+            If flying solo (Phase 1 and 2):
+            - Max wind speed: 15 KT
+            - Max crosswind: 6 KT 
+
+            If flying solo in Phase 3, 4, or 5:
+            - Max wind speed: 25 KT
+            - Max crosswind: 12 KT
+
+            Refer to wind limitations in 1.19.19 in operations manual in briefing room.
+                """
+
+
+info_temp = """
+---ATTENTION PILOT ---
+It is getting pretty hot in here, and its not because of you! Check weather reports
+Confirm that temperature DOES NOT go above the 38C limit!
+"""
