@@ -1,6 +1,10 @@
 # GUI application using the customtkinter module
 import customtkinter as ctk
 import tkinter as tk
+from datetime import datetime
+from fillpdf import fillpdfs
+
+
 
 
 # Sets the appearance of the window
@@ -153,38 +157,34 @@ class App(ctk.CTk):
 
 
     def submit(self):
+            
+            current_time = datetime.now().strftime("%d %b %y %H:%M")
+
             aircraft_registration = get_aircraft_registration(self.aircraftSelection.get())
-            output_text = (f"Aircraft Registration: {aircraft_registration}\n")
+            output_text = (f"{current_time}\n")
             if aircraft_registration not in aircraft_data:
                 output_text = ("Invalid aircraft registration.")
             
-
             # Mass & CG calculations
             slopes = initialize_slopes()
 
-
             fuel = float(self.fuelEntry.get())
             fuel_alt = float(self.fuelaltEntry.get())
-            output_text += ('####################################\n')
-            output_text += ('###  FUEL  ###\n')
-            output_text += ('####################################\n')
             empty_weight = aircraft_data[aircraft_registration]['empty_weight']
             empty_weight_moment = aircraft_data[aircraft_registration]['empty_weight_moment']
             MTOW = aircraft_data[aircraft_registration]['MTOW']
-            output_text += (f"Aircraft {aircraft_registration}: Empty Weight Moment = {empty_weight_moment} kg-mm, MTOW = {MTOW} kg\n")
 
             fuel_conso = float(aircraft_data[aircraft_registration]['fuel_conso']) / 60
             total_fuel_time = fuel + fuel * 0.1 + fuel_alt + 60
-            output_text += (f'Required trip litres for {fuel} minutes : {(fuel * fuel_conso):.2f} L or {(fuel * fuel_conso / 3.785):.2f} gal (US):\n')
-            output_text += (f'Required 10% contingency litres for {fuel * 0.1} minutes : {((fuel * fuel_conso * 0.1)):.2f} L\n')
-            output_text += (f"Required litres for diverting to alternate of {fuel_alt} minutes: {fuel_alt * fuel_conso} L \n")
-            output_text += (f'Reserve fuel is 1 hour, for : {fuel_conso * 60} L\n')
-            output_text += (f'Total Fuel is {total_fuel_time:.2f} minutes : {(total_fuel_time * fuel_conso):.2f} L or {((total_fuel_time * fuel_conso) / 3.785):.2f} gal (US)\n')
-
-            output_text += ('####################################\n')
-            output_text += ('###  MASS & CG  ###\n')
-            output_text += ('####################################\n')
-
+            # Calculate required values
+            trip_litres = fuel * fuel_conso
+            trip_gallons = trip_litres / 3.785
+            contingency_minutes = fuel * 0.1
+            contingency_litres = trip_litres * 0.1
+            alternate_litres = fuel_alt * fuel_conso
+            reserve_litres = fuel_conso * 60
+            total_litres = total_fuel_time * fuel_conso
+            total_gallons = total_litres / 3.785
 
             load_types = [
                 'pilot_and_front_passenger',
@@ -204,24 +204,41 @@ class App(ctk.CTk):
             for load_type in load_types:
                 if load_type == 'pilot_and_front_passenger' :
                     weight = float(self.frontEntry.get())
+                    load_moment = calculate_load_moment(weight, load_type, slopes)
+                    frontw = weight
+                    frontm = load_moment
                 if load_type == 'fuel' :
                     weight = float(self.fuelmEntry.get())
+                    load_moment = calculate_load_moment(weight, load_type, slopes)
+                    fuelw = weight
+                    fuelm = load_moment
                 if load_type == 'rear_passenger' :
                     weight = float(self.rearEntry.get())
+                    load_moment = calculate_load_moment(weight, load_type, slopes)
+                    rearw = weight
+                    rearm = load_moment
                 if load_type == 'baggage_a' :
                     weight = float(self.bagaEntry.get())
+                    load_moment = calculate_load_moment(weight, load_type, slopes)
+                    bagaw = weight
+                    bagam = load_moment
                 if load_type == 'baggage_b' :
-                    weight = float(self.bagbEntry.get())             
-                load_moment = calculate_load_moment(weight, load_type, slopes)
+                    weight = float(self.bagbEntry.get())  
+                    load_moment = calculate_load_moment(weight, load_type, slopes)     
+                    bagbw = weight      
+                    bagbm = load_moment
+                
+
+                
                 
                 print(f"The load moment for {load_type.replace('_', ' ')} with weight {weight} kg is {load_moment:.2f} kg-mm.")
-                output_text += (f"The load moment for {load_type.replace('_', ' ')} with weight {weight} kg is {load_moment:.2f} kg-mm. \n")
-                
+
                 total_weight += weight
                 total_load_moment += load_moment
 
                 if load_type == 'fuel' :
-                    weight_fuel_post_trip = weight - (fuel/60) * fuel_conso * fuel_dens 
+                    fuel_burn_w = (fuel/60) * fuel_conso * fuel_dens 
+                    weight_fuel_post_trip = weight - fuel_burn_w
                     load_moment_fuel_post_trip = calculate_load_moment(weight_fuel_post_trip, 'fuel', slopes)
                     total_weight_post_trip += weight_fuel_post_trip
                     total_load_moment_post_trip += load_moment_fuel_post_trip
@@ -229,23 +246,17 @@ class App(ctk.CTk):
                     total_weight_post_trip += weight
                     total_load_moment_post_trip += load_moment
 
-            output_text += ('####################################\n')
-            output_text += (f"Aircraft {aircraft_registration}: Empty Weight = {aircraft_data[aircraft_registration]['empty_weight']}, \n")
-            output_text += (f"Empty Weight Moment = {aircraft_data[aircraft_registration]['empty_weight_moment']} kg-mm, MTOW = {MTOW} kg\n")
-            output_text += (f"Total Weight is {total_weight:.2f} kg.\n")
-            output_text += (f"Total load moment is {total_load_moment:.2f} kg-mm.\n")
-            output_text += (f"Landing Weight is {total_weight_post_trip:.2f} kg.\n")
-            output_text += (f"Landing Load Moment is {total_load_moment_post_trip:.2f} kg-mm.\n")
-            if total_weight > MTOW:
-                output_text += ("---ATTENTION PILOT--- Total weight exceeds MTOW! Get your papers in order or DO NOT FLY\n")
-    
+            bagw = bagaw + bagbw
+            bagm = bagam + bagbm
+
+            output_text += (f"Aircraft {aircraft_registration}: MTOW = {MTOW} kg, Total Weight = {total_weight:.2f} kg, Total  Moment = {total_load_moment:.2f} kg-mm\n")
 
 
+            #######################
             # Performance calculations
             f_ground_roll, f_dist_to_clear_50ft = prepare_takeoff_interpolator(table_tkoff_2550lb)
             f_climb_speed, f_ROC = prepare_ROC_interpolator(table_ROC_2550lb)
             f_ldg_ground_roll, f_ldg_dist_to_clear_50ft = prepare_LDG_interpolator(table_ldg_2550lb)
-
 
             temperature = float(self.tempEntry.get())
             airport_code = self.airportSelection.get()
@@ -282,26 +293,9 @@ class App(ctk.CTk):
             output_text += ("################################\n")
             output_text += (f"Elevation: {airport['elevation']} ft\n")
             output_text += (f"Best runway heading: {best_runway['heading']}\n")
-            output_text += (f"Best runway length: {best_runway['length']} ft / {(best_runway['length'])*0.3048} m\n")
-            output_text += ("################################\n")
-            output_text += ("Non-Wind corrected distances\n")
-            output_text += ("################################\n")
-            output_text += (f"T/O Ground roll: {ground_roll:.2f} ft\n")
-            output_text += (f"T/O Distance (x1.25): {dist_to_clear_50ft:.2f} ft\n")
-            output_text += (f"Rate of Climb: {ROC:.2f} fpm at Climb Speed: {climb_speed:.2f} KIAS\n")
-            output_text += (f"Landing ground roll: {ldg_ground_roll:.2f} ft\n")
-            output_text += (f"Landing Distance (x1.42): {ldg_dist_to_clear_50ft:.2f} ft\n")
-            output_text += ("################################\n")
-            output_text += ("##########  ~WIND~  ############\n")
-            output_text += ("################################\n")
-            output_text += (f"Headwind component: {best_headwind:.2f} knots\n")
-            output_text += (f"Crosswind component: {abs(best_crosswind):.2f} knots\n")
-            output_text += (f"Adjusted T/O ground roll: {adjusted_ground_roll:.2f} feet\n")
-            output_text += (f"Adjusted T/O Distance to clear 50ft (x1.25): {adjusted_dist_to_clear_50ft:.2f} feet\n")
-            output_text += (f"Rate of Climb: {ROC:.2f} fpm at Climb Speed: {climb_speed:.2f} KIAS\n")
-            output_text += (f"Adjusted landing ground roll: {adjusted_ldg_ground_roll:.2f} feet\n")
-            output_text += (f"Adjusted landing distance to clear 50ft (x1.42): {adjusted_ldg_dist_to_clear_50ft:.2f} feet\n")
+            output_text += (f"Best runway length: {best_runway['length']} ft / {((best_runway['length'])*0.3048):.2f} m\n")
 
+            #Warnings here
             if best_headwind > 15 or abs(best_crosswind) > 8:
                 print(info_wind)
                 output_text += (info_wind + "\n")
@@ -310,8 +304,63 @@ class App(ctk.CTk):
                 print(info_temp)
                 output_text += (info_temp + "\n")
 
+            if total_weight > MTOW:
+                output_text += ("---ATTENTION PILOT---\n")
+                output_text += ("Total weight exceeds MTOW! Get your papers in order or DO NOT FLY\n")
+    
 
             self.outputBox.insert("end", output_text)
+
+
+            #########################
+            #PDF Filling here
+            ########################
+
+            form_fields = list(fillpdfs.get_form_fields('Preflight Template.pdf').keys())
+
+            print(form_fields)
+
+
+
+            data_dict = {
+                form_fields[0]: f"{current_time} UTC",  # Assuming time is in UTC format
+                form_fields[1]: 'C172S',
+                form_fields[2]: aircraft_registration,
+                form_fields[3]: f"{fuel:.2f} min",
+                form_fields[4]: f"{empty_weight:.2f} kg",
+                form_fields[5]: f"{frontw:.2f} kg",
+                form_fields[6]: f"{rearw:.2f} kg",
+                form_fields[7]: f"{fuelw:.2f} kg",
+                form_fields[8]: f"{bagw:.2f} kg",
+                form_fields[9]: f"{total_weight:.2f} kg",
+                form_fields[10]: f"{fuel_burn_w:.2f} kg",
+                form_fields[11]: f"{(total_weight - (fuel_burn_w)):.2f} kg",
+                form_fields[12]: f"{empty_weight_moment:.2f} kg-mm",
+                form_fields[13]: f"{frontm:.2f} kg-mm",
+                form_fields[14]: f"{rearm:.2f} kg-mm",
+                form_fields[15]: f"{fuelm:.2f} kg-mm",
+                form_fields[16]: f"{bagm:.2f} kg-mm",
+                form_fields[17]: f"{total_load_moment:.2f} kg-mm",
+                form_fields[18]: f"{total_load_moment_post_trip:.2f} kg-mm",
+                form_fields[19]: f"{fuel:.2f} minutes",
+                form_fields[20]: f"{contingency_minutes:.1f} min",
+                form_fields[21]: f"{fuel_alt:.2f} min",
+                form_fields[22]: f"{trip_litres:.2f} L",
+                form_fields[23]: f"{contingency_litres:.2f} L",
+                form_fields[24]: f"{alternate_litres:.2f} L",
+                form_fields[25]: f"{reserve_litres:.2f} L",
+                form_fields[26]: f"{total_fuel_time:.2f} min",
+                form_fields[27]: f"{total_litres:.2f} L",
+                form_fields[28]: f"{ground_roll:.2f} ft",
+                form_fields[29]: (f"{dist_to_clear_50ft:.2f} ft"),
+                form_fields[30]: (f"{ROC:.2f} fpm"),
+                form_fields[31]: None,
+                form_fields[32]: (f"{adjusted_ldg_ground_roll:.2f} ft"),
+                form_fields[33]: (f"{adjusted_ldg_dist_to_clear_50ft:.2f} ft"),
+            }
+
+            fillpdfs.write_fillable_pdf('Preflight Template.pdf', f"Outputs/Preflight Checklist {datetime.now().strftime('%d-%b-%y %H%M')}.pdf", data_dict)
+
             return
 
 
