@@ -4,6 +4,7 @@ import tkinter as tk
 from datetime import datetime
 from fillpdf import fillpdfs
 from envelope import plot_cg_envelope
+from tkinter import END  
 
 # Sets the appearance of the window
 # Supported modes : Light, Dark, System
@@ -158,11 +159,14 @@ class App(ctk.CTk):
 
 
     def submit(self):
-            
+                    # Clear the output text box before adding new output
+            self.outputBox.delete('1.0', END)
+
             current_time = datetime.now().strftime("%d %b %y %H:%M")
 
             aircraft_registration = get_aircraft_registration(self.aircraftSelection.get())
             output_text = (f"{current_time}\n")
+
             if aircraft_registration not in aircraft_data:
                 output_text = ("Invalid aircraft registration.")
             
@@ -313,7 +317,7 @@ class App(ctk.CTk):
                 output_text += ("---ATTENTION PILOT---\n")
                 output_text += ("Total weight exceeds MTOW! Get your papers in order or DO NOT FLY\n")
     
-
+            print(output_text)
             self.outputBox.insert("end", output_text)
 
 
