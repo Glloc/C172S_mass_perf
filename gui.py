@@ -3,9 +3,7 @@ import customtkinter as ctk
 import tkinter as tk
 from datetime import datetime
 from fillpdf import fillpdfs
-
-
-
+from envelope import plot_cg_envelope
 
 # Sets the appearance of the window
 # Supported modes : Light, Dark, System
@@ -20,6 +18,8 @@ appWidth, appHeight = 1200, 800
 
 def get_aircraft_registration(aircraft_registration_input):
     if aircraft_registration_input.startswith("LY-"):
+        return aircraft_registration_input
+    if aircraft_registration_input.startswith("OO-"):
         return aircraft_registration_input
     else :
         return f"LY-{aircraft_registration_input}"
@@ -46,6 +46,7 @@ from C172S_perf_code_wind import (
     print_wind_corrected_data,
     adjust_distances_for_headwind
 )
+
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -249,8 +250,12 @@ class App(ctk.CTk):
             bagw = bagaw + bagbw
             bagm = bagam + bagbm
 
-            output_text += (f"Aircraft {aircraft_registration}: MTOW = {MTOW} kg, Total Weight = {total_weight:.2f} kg, Total  Moment = {total_load_moment:.2f} kg-mm\n")
-
+            output_text += (f"Aircraft {aircraft_registration}: \n MTOW = {MTOW} kg, Total Weight = {total_weight:.2f} kg, Total  Moment = {total_load_moment:.2f} kg-mm\n")
+            
+            
+            #######################
+            #Plot Mass and Balance
+            plot_cg_envelope((total_load_moment, total_weight),(total_load_moment_post_trip, total_weight_post_trip))
 
             #######################
             # Performance calculations
