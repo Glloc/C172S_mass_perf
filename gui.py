@@ -303,10 +303,16 @@ class App(ctk.CTk):
             output_text += (f"Elevation: {airport['elevation']} ft\n")
             output_text += (f"Best runway heading: {best_runway['heading']}\n")
             output_text += (f"Best runway length: {best_runway['length']} ft / {((best_runway['length'])*0.3048):.2f} m\n")
+            output_text += ("\n")
 
             #Warnings here
             if best_headwind > 15 or abs(best_crosswind) > 8:
                 print(info_wind)
+                print('Headwind = ', best_headwind)
+                print('Crosswind = ', best_crosswind)
+                output_text += ("---ATTENTION PILOT---\n")
+                output_text += (f'Headwind = {best_headwind:.2f} \n')
+                output_text += (f'Crosswind = {best_crosswind:.2f} \n')
                 output_text += (info_wind + "\n")
 
             if temperature > 35:

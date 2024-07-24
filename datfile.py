@@ -48,7 +48,7 @@ aircraft_data = {
     'LY-FTA': {'empty_weight_moment': 807.73, 'empty_weight': 788.8, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
     'LY-FTF': {'empty_weight_moment': 833.69, 'empty_weight': 783.35, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
     'LY-FTX': {'empty_weight_moment': 821, 'empty_weight': 782, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
-    'OO-JDH': {'empty_weight_moment': 839, 'empty_weight': 781, 'MTOW': 1157, 'fuel_conso': 36, 'fuel_density': 0.72},
+    'OO-JDH': {'empty_weight_moment': 837, 'empty_weight': 781, 'MTOW': 1157, 'fuel_conso': 40, 'fuel_density': 0.72},
     'LY-BGV': {'empty_weight_moment': 825.06, 'empty_weight': 780.4, 'MTOW': 1100, 'fuel_conso': 36, 'fuel_density': 0.72}
     #'LY-MEP': {'empty_weight_moment': 395, 'empty_weight': 868, 'MTOW': 1230, 'fuel_conso': 34, 'fuel_density': 0.72},
 
