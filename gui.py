@@ -303,6 +303,8 @@ class App(ctk.CTk):
             output_text += (f"Elevation: {airport['elevation']} ft\n")
             output_text += (f"Best runway heading: {best_runway['heading']}\n")
             output_text += (f"Best runway length: {best_runway['length']} ft / {((best_runway['length'])*0.3048):.2f} m\n")
+            output_text += (f'Headwind = {best_headwind:.2f} KT \n')
+            output_text += (f'Crosswind = {best_crosswind:.2f} KT\n')
             output_text += ("\n")
 
             #Warnings here
@@ -311,8 +313,7 @@ class App(ctk.CTk):
                 print('Headwind = ', best_headwind)
                 print('Crosswind = ', best_crosswind)
                 output_text += ("---ATTENTION PILOT---\n")
-                output_text += (f'Headwind = {best_headwind:.2f} \n')
-                output_text += (f'Crosswind = {best_crosswind:.2f} \n')
+
                 output_text += (info_wind + "\n")
 
             if temperature > 35:
@@ -338,7 +339,7 @@ class App(ctk.CTk):
 
 
             data_dict = {
-                form_fields[0]: f"{current_time} UTC",  # Assuming time is in UTC format
+                form_fields[0]: f"{current_time} local", 
                 form_fields[1]: 'C172S',
                 form_fields[2]: aircraft_registration,
                 form_fields[3]: f"{fuel:.2f} min",
